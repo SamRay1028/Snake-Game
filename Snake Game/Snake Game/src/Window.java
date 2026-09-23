@@ -3,6 +3,7 @@ import java.awt.event.*;
 import java.awt.*;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.lang.Object;
 import java.net.URL;
 
@@ -24,6 +25,7 @@ public class Window extends JPanel implements MouseListener, MouseMotionListener
     int tempX = 0;
     int tempY = 0;
     int count = 1;
+    HashMap<Integer, int[]> grid = new HashMap<>();
 
     public Window(){
         setBackground(Color.GREEN.darker());
@@ -32,6 +34,19 @@ public class Window extends JPanel implements MouseListener, MouseMotionListener
         addKeyListener(this);
         setFocusable(true);
         fullSnake.elongate(0,0);
+        for(int i = 0; i < 20; i++){
+            for(int j = 0; j < 20; j++){
+                grid.put(i * 20 + j, new int[]{i, j});
+            }
+        }
+    }
+
+    public ArrayList<int[]> findAvailableGrid(){
+        HashMap<Integer, int[]> availableGrid = new HashMap<>(grid);
+        for(int i = 0; i < fullSnake.snake.size(); i++){
+            availableGrid.remove((fullSnake.snake.get(i).getY() * 20 + fullSnake.snake.get(i).getX()) / 50);
+        }
+        return new ArrayList<>(availableGrid.values());
     }
 
     public void paintComponent(Graphics g){
@@ -162,7 +177,7 @@ public class Window extends JPanel implements MouseListener, MouseMotionListener
         }
         if(!isTouchingWall){
             if(e.getSource() == wait){
-                System.out.println(count);
+                //System.out.println(count);
                 if(fullSnake.getHeadCoords().getX() > 900){
                     wait.stop();
                     wait2.stop();
@@ -176,7 +191,7 @@ public class Window extends JPanel implements MouseListener, MouseMotionListener
                         tempY = fullSnake.getHeadCoords().getY();
                         fullSnake.MoveRight();
                         fullSnake.elongate(tempX, tempY);
-                        apple.move();
+                        apple.move(findAvailableGrid());
                         repaint();
 
                     }
@@ -202,7 +217,7 @@ public class Window extends JPanel implements MouseListener, MouseMotionListener
                         tempY = fullSnake.getHeadCoords().getY();
                         fullSnake.MoveLeft();
                         fullSnake.elongate(tempX, tempY);
-                        apple.move();
+                        apple.move(findAvailableGrid());
                         repaint();
 
                     }
@@ -228,7 +243,7 @@ public class Window extends JPanel implements MouseListener, MouseMotionListener
                         tempY = fullSnake.getHeadCoords().getY();
                         fullSnake.MoveUp();
                         fullSnake.elongate(tempX, tempY);
-                        apple.move();
+                        apple.move(findAvailableGrid());
                         repaint();
                     }
                     else {
@@ -253,7 +268,7 @@ public class Window extends JPanel implements MouseListener, MouseMotionListener
                         tempY = fullSnake.getHeadCoords().getY();
                         fullSnake.MoveDown();
                         fullSnake.elongate(tempX, tempY);
-                        apple.move();
+                        apple.move(findAvailableGrid());
                         repaint();
 
                     }
@@ -268,6 +283,5 @@ public class Window extends JPanel implements MouseListener, MouseMotionListener
         }
 
     }
-
-
+    
 }
